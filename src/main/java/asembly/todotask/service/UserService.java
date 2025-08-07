@@ -5,10 +5,10 @@ import asembly.todotask.entity.Task;
 import asembly.todotask.entity.User;
 import asembly.todotask.repository.TaskRepository;
 import asembly.todotask.repository.UserRepository;
-import asembly.todotask.type.TaskProgress;
 import asembly.todotask.util.GeneratorId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,6 @@ public class UserService {
 
     public ResponseEntity<User> create(User user)
     {
-        user.setId(GeneratorId.generateShortUuid());
         return ResponseEntity.ok(userRepository.save(user));
     }
 
@@ -33,8 +32,8 @@ public class UserService {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    public ResponseEntity<User> findById(String id)
-    {
+    @Cacheable(key = "#id", value = "users")
+    public ResponseEntity<User> findById(String id){
         return ResponseEntity.ok(userRepository.findById(id).orElseThrow());
     }
 
@@ -43,7 +42,6 @@ public class UserService {
         User user = userRepository.findById(user_id).orElseThrow();
         Task task = new Task();
         task.setTitle(taskDto.title());
-        task.setProgress(TaskProgress.TODO);
         task.setUser(user);
         task.setId(GeneratorId.generateShortUuid());
         taskRepository.save(task);

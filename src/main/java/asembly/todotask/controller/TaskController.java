@@ -1,5 +1,7 @@
 package asembly.todotask.controller;
 
+import asembly.todotask.dto.CreateTagDto;
+import asembly.todotask.entity.Tag;
 import asembly.todotask.entity.Task;
 import asembly.todotask.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,12 @@ public class TaskController {
     public ResponseEntity<Task> patch(@PathVariable String id, @RequestBody Task task)
     {
         return taskService.patch(task, id);
+    }
+
+    @PostMapping("/{id}/tags")
+    public ResponseEntity<Tag> addTag(@PathVariable String id, @RequestBody CreateTagDto tagDto)
+    {
+        return taskService.addTag(tagDto, id);
     }
 
 }

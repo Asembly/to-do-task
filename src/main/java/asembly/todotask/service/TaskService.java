@@ -1,7 +1,11 @@
 package asembly.todotask.service;
 
+import asembly.todotask.dto.CreateTagDto;
+import asembly.todotask.entity.Tag;
 import asembly.todotask.entity.Task;
+import asembly.todotask.repository.TagRepository;
 import asembly.todotask.repository.TaskRepository;
+import asembly.todotask.util.GeneratorId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,7 @@ import java.util.List;
 public class TaskService {
 
     private TaskRepository taskRepository;
+    private TagRepository tagRepository;
 
     public ResponseEntity<List<Task>> findAll()
     {
@@ -43,10 +48,19 @@ public class TaskService {
         if(newTask.getTitle() != null)
             task.setTitle(newTask.getTitle());
 
-        if(newTask.getProgress() != null)
-            task.setProgress(newTask.getProgress());
-
         return ResponseEntity.ok(taskRepository.save(task));
     }
 
+    public ResponseEntity<Tag> addTag(CreateTagDto tagDto, String task_id)
+    {
+        Task task = taskRepository.findById(task_id).orElseThrow();
+        Tag tag = new Tag();
+        tag.setName(tagDto.name());
+        tag.setColor(tagDto.color());
+        tag.setTask(task);
+        tag.setId(GeneratorId.generateShortUuid());
+        tagRepository.save(tag);
+        task.addTag(tag);
+        return ResponseEntity.ok(tag);
+    }
 }

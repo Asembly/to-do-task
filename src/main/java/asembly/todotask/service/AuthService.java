@@ -1,10 +1,13 @@
 package asembly.todotask.service;
 
+import asembly.todotask.dto.SignUpUserDto;
 import asembly.todotask.entity.User;
 import asembly.todotask.repository.UserRepository;
 import asembly.todotask.security.JwtService;
+import asembly.todotask.util.GeneratorId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,14 +26,23 @@ public class AuthService {
     @Autowired
     private JwtService jwtService;
 
-    public ResponseEntity<User> signUp(User user)
+    public ResponseEntity<?> signUp(SignUpUserDto userDto)
     {
-        if(userRepository.findByUsername(user.getUsername()).isPresent())
-            throw new IllegalStateException("user with username: " + user.getUsername() + " found.");
+        if(userRepository.findByUsername(userDto.username()).isPresent())
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("user with username: \" + userDto.username() + \" found.");
 
-        user.setPassword(encoder.encode(user.getPassword()));
+        User user = new User(
+                GeneratorId.generateShortUuid(),
+                userDto.username(),
+                encoder.encode(userDto.password()),
+                userDto.email(),
+                null
+        );
 
-        return userService.create(user);
+        return ResponseEntity.ok(userService.create(user));
     }
 
     public ResponseEntity<String> signIn(User user)

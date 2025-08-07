@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
 @Entity @Data @Table(name = "users")
+@AllArgsConstructor
 public class User {
     @Id
     private String id;
@@ -28,4 +30,6 @@ public class User {
         tasks.add(task);
         task.setUser(this);
     }
+
+    public User(){}
 }

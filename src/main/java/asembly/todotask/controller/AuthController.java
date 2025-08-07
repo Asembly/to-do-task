@@ -1,5 +1,6 @@
 package asembly.todotask.controller;
 
+import asembly.todotask.dto.SignUpUserDto;
 import asembly.todotask.entity.User;
 import asembly.todotask.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("sign-up")
-    public ResponseEntity<User> signUp(@RequestBody User user)
+    public ResponseEntity<?> signUp(@RequestBody SignUpUserDto user)
     {
         return authService.signUp(user);
     }
