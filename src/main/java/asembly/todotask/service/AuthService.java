@@ -6,6 +6,7 @@ import asembly.todotask.repository.UserRepository;
 import asembly.todotask.security.JwtService;
 import asembly.todotask.util.GeneratorId;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,14 +46,24 @@ public class AuthService {
         return ResponseEntity.ok(userService.create(user));
     }
 
-    public ResponseEntity<String> signIn(User user)
-    {
+    public ResponseEntity<String> signIn(User user) {
         User newUser = userRepository.findByUsername(user.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("user with username: " + user.getUsername() + " not found.")
         );
 
-        if(encoder.matches(user.getPassword(), newUser.getPassword()))
-            return ResponseEntity.ok(jwtService.genJwt(user.getUsername()));
+
+        if (encoder.matches(user.getPassword(), newUser.getPassword()))
+        {
+            JSONObject userJson = new JSONObject();
+            userJson.put("id", newUser.getId());
+            userJson.put("username", newUser.getUsername());
+            userJson.put("email", newUser.getEmail());
+
+            JSONObject json = new JSONObject();
+            json.put("user", userJson);
+            json.put("token", jwtService.genJwt(user.getUsername()));
+            return ResponseEntity.ok(json.toString());
+        }
 
         return ResponseEntity.badRequest().body("jwt not gen.");
     }
