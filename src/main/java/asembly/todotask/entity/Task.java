@@ -19,6 +19,7 @@ public class Task {
     private String id;
     @Column(nullable = false)
     private String title;
+    private boolean finish;
 
     //USER JOIN
     @ManyToOne

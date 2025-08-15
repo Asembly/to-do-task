@@ -32,7 +32,6 @@ public class UserService {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @Cacheable(key = "#id", value = "users")
     public ResponseEntity<User> findById(String id){
         return ResponseEntity.ok(userRepository.findById(id).orElseThrow());
     }
@@ -44,6 +43,7 @@ public class UserService {
         task.setTitle(taskDto.title());
         task.setUser(user);
         task.setId(GeneratorId.generateShortUuid());
+        task.setFinish(false);
         taskRepository.save(task);
         user.addTask(task);
         return ResponseEntity.ok(task);
