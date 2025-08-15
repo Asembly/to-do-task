@@ -1,7 +1,10 @@
 package asembly.todotask.service;
 
+import asembly.todotask.dto.SignInUserDto;
 import asembly.todotask.dto.SignUpUserDto;
+import asembly.todotask.dto.UserIdDto;
 import asembly.todotask.entity.User;
+import asembly.todotask.repository.RefreshTokenRepository;
 import asembly.todotask.repository.UserRepository;
 import asembly.todotask.security.JwtService;
 import asembly.todotask.util.GeneratorId;
@@ -22,6 +25,10 @@ public class AuthService {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
     @Autowired
     private PasswordEncoder encoder;
     @Autowired
@@ -46,13 +53,17 @@ public class AuthService {
         return ResponseEntity.ok(userService.create(user));
     }
 
-    public ResponseEntity<String> signIn(User user) {
-        User newUser = userRepository.findByUsername(user.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("user with username: " + user.getUsername() + " not found.")
+    public ResponseEntity<String> signIn(SignInUserDto userDto) {
+        User newUser = userRepository.findByUsername(userDto.username()).orElseThrow(
+                () -> new UsernameNotFoundException("user with username: " + userDto.username() + " not found.")
         );
 
+        if(refreshTokenRepository.findTokenByUserId(newUser.getId()).isPresent())
+            return ResponseEntity.badRequest().body("User already login");
 
-        if (encoder.matches(user.getPassword(), newUser.getPassword()))
+        var refreshToken = refreshTokenService.generateRefreshToken(newUser.getId()).getBody();
+
+        if (encoder.matches(userDto.password(), newUser.getPassword()))
         {
             JSONObject userJson = new JSONObject();
             userJson.put("id", newUser.getId());
@@ -61,7 +72,8 @@ public class AuthService {
 
             JSONObject json = new JSONObject();
             json.put("user", userJson);
-            json.put("token", jwtService.genJwt(user.getUsername()));
+            json.put("access_token", jwtService.genJwt(userDto.username()));
+            json.put("refresh_token", refreshToken);
             return ResponseEntity.ok(json.toString());
         }
 

@@ -6,11 +6,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Entity @Data @Table(name = "users")
+@Entity
+@Data
+@Table(name = "users")
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     private String id;
@@ -22,6 +26,7 @@ public class User {
     @Column(unique = true, nullable = false)
     @Email
     private String email;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "user")
     private List<Task> tasks;
@@ -30,6 +35,4 @@ public class User {
         tasks.add(task);
         task.setUser(this);
     }
-
-    public User(){}
 }
