@@ -14,8 +14,6 @@ const initState = {
 
 export default function TagForm({taskId}: {taskId: string})
 {
-
-    // const [action, setAction] = useActionState(createTag, initState)
     const [color, setColor] = useState("#FFDBB1")
     const formRef = useRef<HTMLFormElement>(null)
 
@@ -29,10 +27,10 @@ export default function TagForm({taskId}: {taskId: string})
         console.log(taskId)
 
         try {
-        await createTag(initState, formData);
-        alert("Тег создан!");
+            await createTag(initState, formData);
+            console.log("Тег создан!");
         } catch (error) {
-        alert("Ошибка при создании тега");
+            console.log("Ошибка при создании тега");
         }
     };
 

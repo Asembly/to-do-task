@@ -1,7 +1,7 @@
 'use server'
 
 import { authConfig, serverInstance } from "@/utils/config"
-import { auth } from "./auth";
+import { auth, signOut } from "./auth";
 
 export async function getTasks()
 {
@@ -132,4 +132,82 @@ export async function removeTag(tagId: string)
    .catch(error => error)
 
    return response
+}
+
+export async function logout(refreshToken: string | undefined)
+{
+   console.log(refreshToken)
+
+   if(refreshToken == undefined)
+      return "Refresh Token is undefined"
+
+   const session: { user?: { id: string }; accessToken?: string } | null = await auth() 
+   const accessToken = session?.accessToken
+
+   const data = {
+      refreshToken: refreshToken
+   } 
+
+   const response = await serverInstance.post(`/api/auth/logout`,data,
+      {
+         headers: {
+            'Authorization': "Bearer " + accessToken,
+            'Content-Type': "application/json"
+         },
+      }
+   )  
+   .then(res => res.data)
+   .catch(error => error)
+
+   await signOut()   
+
+   return response 
+}
+
+export async function refreshAccessToken(refreshToken: string | undefined)
+{
+   console.log(refreshToken)
+
+   if(refreshToken == undefined)
+      return "Refresh Token is undefined"
+
+   const session: { user?: { id: string }; accessToken?: string } | null = await auth() 
+   const accessToken = session?.accessToken
+
+   const data = {
+      refreshToken: refreshToken
+   } 
+
+   const response = await serverInstance.post(`/api/auth/refresh`,data,
+      {
+         headers: {
+            'Authorization': "Bearer " + accessToken,
+            'Content-Type': "application/json"
+         },
+      }
+   )  
+   .then(res => res.data)
+   .catch(error => error)
+
+
+   return response 
+}
+
+export async function getUsers()
+{
+   const session: { user?: { id: string }; accessToken?: string } | null = await auth() 
+   const accessToken = session?.accessToken
+
+   const response = await serverInstance.get(`/api/user`,
+      {
+         headers: {
+            'Authorization': "Bearer " + accessToken,
+            'Content-Type': "application/json"
+         },
+      }
+   )  
+   .then(res => res.data)
+   .catch(error => error)
+
+   return response   
 }

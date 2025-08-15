@@ -1,6 +1,5 @@
 import axios from "axios";
 import { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
 
 export const serverInstance = axios.create({
   baseURL: 'http://localhost:8080',

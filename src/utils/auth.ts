@@ -9,14 +9,21 @@ export const { auth, signIn, signOut, handlers} = NextAuth({
         if (session?.user) 
           session.user.id = token.uid
 
-        if (token && token.accessToken)
+        if (token && token.accessToken && token.refreshToken)
+        {
           session.accessToken = token.accessToken 
+          session.refreshToken = token.refreshToken
+        }
 
         return session;
       },
       jwt: async ({ user, token }) => {
-        if(user && user.accessToken)
+
+        if(user && user.accessToken && user.refreshToken)
+        {
           token.accessToken = user?.accessToken
+          token.refreshToken = user?.refreshToken
+        }
 
         if (user && user.id) 
           token.uid = user.id
@@ -34,20 +41,21 @@ export const { auth, signIn, signOut, handlers} = NextAuth({
                 password: credentials.password
             }
 
-            let response: {token: String, user: User} = await serverInstance.post('/api/auth/sign-in', data)
+            let response: {access_token: String, refresh_token: String, user: User} = await serverInstance.post('/api/auth/sign-in', data)
             .then(res => res.data)
             .catch(error => error)
 
             if(!response.user)
                 return null
 
-            console.log(response.token)
+            console.log(response.access_token)
 
             return {
                 id: response.user.id, 
                 name: response.user.username, 
                 email: response.user.email, 
-                accessToken: response.token
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token
             } as any 
         },
         credentials: {
