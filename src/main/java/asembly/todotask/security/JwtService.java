@@ -6,9 +6,12 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 
 @Service
@@ -25,8 +28,8 @@ public class JwtService {
             return JWT.create()
                     .withSubject(username)
                     .withIssuer("auth0")
-                    .withIssuedAt(new Date())
-                    .withExpiresAt(new Date(new Date().getTime() + expirationMs))
+                    .withIssuedAt(Timestamp.from(Instant.now()))
+                    .withExpiresAt(Timestamp.from(Instant.now().plusMillis(expirationMs)))
                     .sign(alg);
         }catch(JWTCreationException e)
         {
@@ -46,6 +49,36 @@ public class JwtService {
             return true;
         }catch (JWTVerificationException e) {
             throw new JWTVerificationException(e.getMessage() + "\nInvalid signature/claims", e.getCause());
+        }
+    }
+
+    public Timestamp getIssuedAt(String token)
+    {
+        try {
+            Algorithm alg = Algorithm.HMAC256(secretKey);
+            JWTVerifier verifier = JWT.require(alg)
+                    .withIssuer("auth0")
+                    .build();
+            DecodedJWT decodedJWT = verifier.verify(token);
+            return Timestamp.from(decodedJWT.getIssuedAt().toInstant());
+        }catch(JWTVerificationException exception)
+        {
+            return null;
+        }
+    }
+
+    public Timestamp getExpiresAt(String token)
+    {
+        try {
+            Algorithm alg = Algorithm.HMAC256(secretKey);
+            JWTVerifier verifier = JWT.require(alg)
+                    .withIssuer("auth0")
+                    .build();
+            DecodedJWT decodedJWT = verifier.verify(token);
+            return Timestamp.from(decodedJWT.getExpiresAt().toInstant());
+        }catch(JWTVerificationException exception)
+        {
+            return null;
         }
     }
 

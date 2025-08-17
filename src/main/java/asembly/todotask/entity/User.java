@@ -19,7 +19,7 @@ public class User {
     @Id
     private String id;
     @Column(unique = true, nullable = false)
-    @Size(min = 5, max = 10)
+    @Size(min = 5, max = 30)
     private String username;
     @Size(min = 8, max = 255)
     private String password;

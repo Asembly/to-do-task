@@ -12,6 +12,7 @@ import asembly.todotask.util.GeneratorId;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +75,11 @@ public class RefreshTokenService {
         if(newJwt == null)
             return ResponseEntity.badRequest().body("Token not generated");
 
-        return ResponseEntity.ok(newJwt);
+        JSONObject json = new JSONObject();
+        json.put("access_token", newJwt);
+        json.put("expires_at", jwtService.getExpiresAt(newJwt).getTime());
+
+        return ResponseEntity.ok(json.toString());
     }
 
     public boolean isTokenExpired(RefreshToken token) {

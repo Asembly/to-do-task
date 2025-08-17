@@ -63,6 +63,8 @@ public class AuthService {
 
         var refreshToken = refreshTokenService.generateRefreshToken(newUser.getId()).getBody();
 
+        var accessToken = jwtService.genJwt(userDto.username());
+
         if (encoder.matches(userDto.password(), newUser.getPassword()))
         {
             JSONObject userJson = new JSONObject();
@@ -72,8 +74,9 @@ public class AuthService {
 
             JSONObject json = new JSONObject();
             json.put("user", userJson);
-            json.put("access_token", jwtService.genJwt(userDto.username()));
+            json.put("access_token", accessToken);
             json.put("refresh_token", refreshToken);
+            json.put("expires_at", jwtService.getExpiresAt(accessToken).getTime());
             return ResponseEntity.ok(json.toString());
         }
 
