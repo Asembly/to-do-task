@@ -3,6 +3,7 @@ package asembly.todotask.service;
 import asembly.todotask.dto.SignInUserDto;
 import asembly.todotask.dto.SignUpUserDto;
 import asembly.todotask.dto.UserIdDto;
+import asembly.todotask.entity.RefreshToken;
 import asembly.todotask.entity.User;
 import asembly.todotask.repository.RefreshTokenRepository;
 import asembly.todotask.repository.UserRepository;
@@ -54,14 +55,20 @@ public class AuthService {
     }
 
     public ResponseEntity<String> signIn(SignInUserDto userDto) {
+        JSONObject json = new JSONObject();
+
         User newUser = userRepository.findByUsername(userDto.username()).orElseThrow(
                 () -> new UsernameNotFoundException("user with username: " + userDto.username() + " not found.")
         );
 
-        if(refreshTokenRepository.findTokenByUserId(newUser.getId()).isPresent())
-            return ResponseEntity.badRequest().body("User already login");
 
-        var refreshToken = refreshTokenService.generateRefreshToken(newUser.getId()).getBody();
+
+        var refreshToken = refreshTokenRepository.findTokenByUserId(newUser.getId());
+
+        if(refreshToken.isEmpty())
+            json.put("refresh_token", refreshTokenService.generateRefreshToken(newUser.getId()).getBody());
+        else
+            json.put("refresh_token", refreshToken.get().getToken());
 
         var accessToken = jwtService.genJwt(userDto.username());
 
@@ -72,10 +79,8 @@ public class AuthService {
             userJson.put("username", newUser.getUsername());
             userJson.put("email", newUser.getEmail());
 
-            JSONObject json = new JSONObject();
             json.put("user", userJson);
             json.put("access_token", accessToken);
-            json.put("refresh_token", refreshToken);
             json.put("expires_at", jwtService.getExpiresAt(accessToken).getTime());
             return ResponseEntity.ok(json.toString());
         }

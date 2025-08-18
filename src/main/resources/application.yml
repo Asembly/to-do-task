@@ -10,5 +10,5 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
   jwt:
     secret: ${SPRING_JWT_SECRET}
-    expiration: 360000
+    expiration: 3600000
     refresh_expiration: 3600000000
