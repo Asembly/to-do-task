@@ -51,6 +51,8 @@ public class AuthService {
                 null
         );
 
+        log.info("USER SIGN UP " + user.getUsername());
+
         return ResponseEntity.ok(userService.create(user));
     }
 
@@ -82,6 +84,8 @@ public class AuthService {
             json.put("user", userJson);
             json.put("access_token", accessToken);
             json.put("expires_at", jwtService.getExpiresAt(accessToken).getTime());
+            log.info(json.toString());
+            log.info("USER LOGGED " + newUser.getUsername());
             return ResponseEntity.ok(json.toString());
         }
 

@@ -5,7 +5,6 @@ plugins {
 }
 
 group = 'asembly'
-version = '1.2.0'
 
 java {
 	toolchain {
