@@ -2,7 +2,7 @@
 import { signUp } from "@/utils/actions";
 import { Box, Button, Field, Input, Link, Stack, Text, VStack } from "@chakra-ui/react";
 import { signIn } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
 
 export default function SignIn()
@@ -12,7 +12,16 @@ export default function SignIn()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await signIn("credentials", { username, password, redirect: true ,callbackUrl: "/" }); 
+        const response = await signIn("credentials", { username, password, redirect: false ,callbackUrl: "/" }); 
+
+        if(response.error)
+        {
+            console.log('error')
+        }
+        else{
+            redirect('/')
+        }
+
     };
 
     return(

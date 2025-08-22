@@ -53,7 +53,7 @@ export async function login(data: Login)
    if(isAxiosError(response))
    {
       console.log('Пользователь с такими данными не найден.')
-      return undefined 
+      return undefined
    }
 
    console.log("Пользователь успешно авторизовался на сервере: " + response.user.username)
