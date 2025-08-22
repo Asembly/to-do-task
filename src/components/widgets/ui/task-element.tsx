@@ -25,7 +25,7 @@ export default function TaskElement({props}: {props: {
                 <Heading size="md">Задача № {props.id}</Heading>
             </Card.Header>
             <Card.Body color="fg.muted" flexDir={'row'} justifyContent={'space-between'}>
-                <Box textDecoration={state ? 'none' : 'line-through'}>
+                <Box textDecoration={state ? 'line-through' : 'none'}>
                     {
                         props.title
                     }
